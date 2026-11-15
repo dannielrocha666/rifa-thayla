@@ -1,4 +1,4 @@
-/* Rifa da Thayla | SPA sem compilação: Supabase Auth + PostgreSQL/RLS. */
+/* Rifa da Thailla | SPA sem compilação: Supabase Auth + PostgreSQL/RLS. */
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
@@ -136,7 +136,7 @@
   }
   function subscribeToChanges() {
     if (APP.channel) APP.sb.removeChannel(APP.channel);
-    APP.channel = APP.sb.channel('rifa-thayla-tickets')
+    APP.channel = APP.sb.channel('rifa-thailla-tickets')
       .on('postgres_changes', {event:'UPDATE',schema:'public',table:'tickets'}, () => {
         if (APP.profile) loadData().catch(err => console.warn('Sincronização:',err));
       }).subscribe();
@@ -268,7 +268,7 @@
   function renderShare() {
     const data=getShareInfo();if(!data){$('shareCard').innerHTML='<div class="share-empty">Nenhum vendedor disponível.</div>';return;}
     const {seller,numbers,paid,reserved}=data;
-    $('shareCard').innerHTML=`<div class="share-card-head"><span class="share-kicker">MISS BRASIL FASHION PARÁ</span><h3>Rifa da Thayla ✦</h3><p>Thayla Almeida • Representando o Maranhão</p></div>
+    $('shareCard').innerHTML=`<div class="share-card-head"><span class="share-kicker">MISS BRASIL FASHION PARÁ</span><h3>Rifa da Thailla ✦</h3><p>Thailla Almeida • Representando o Maranhão</p></div>
       <div class="share-card-meta"><div class="share-meta-item"><span>VENDEDOR(A)</span><strong>${esc(seller.name)}</strong></div><div class="share-meta-item"><span>FAIXA</span><strong>${fmtNum(seller.start_number)}–${fmtNum(seller.end_number)}</strong></div><div class="share-meta-item"><span>LIVRES</span><strong>${numbers.length} números</strong></div></div>
       <div class="share-body"><div class="share-body-header"><h4>Números disponíveis</h4><small>${numbers.length} livres · ${paid+reserved} indisponíveis</small></div>
       ${numbers.length?`<div class="number-grid">${numbers.map(n=>`<span class="number-chip">${fmtNum(n)}</span>`).join('')}</div>`:'<div class="share-empty">Todos os números desta faixa foram reservados ou vendidos.</div>'}</div>
@@ -276,7 +276,7 @@
   }
   function copyAvailable() {
     const data=getShareInfo(); if (!data) return;
-    const msg=`🎟️ RIFA DA THAYLA — ${data.seller.name}\nNúmeros disponíveis (${data.numbers.length}):\n${data.numbers.map(fmtNum).join(', ') || 'Nenhum disponível'}\n\n💰 R$ 10,00 por número\n🎉 Sorteio: 15/12/2026 às 18h\n💳 Pix: 62501022300\nConsulte o vendedor antes de pagar: a disponibilidade pode mudar.`;
+    const msg=`🎟️ RIFA DA THAILLA — ${data.seller.name}\nNúmeros disponíveis (${data.numbers.length}):\n${data.numbers.map(fmtNum).join(', ') || 'Nenhum disponível'}\n\n💰 R$ 10,00 por número\n🎉 Sorteio: 15/12/2026 às 18h\n💳 Pix: 62501022300\nConsulte o vendedor antes de pagar: a disponibilidade pode mudar.`;
     if(navigator.clipboard?.writeText) navigator.clipboard.writeText(msg).then(()=>notify('Lista copiada para o WhatsApp!')).catch(()=>fallbackCopy(msg));
     else fallbackCopy(msg);
   }
@@ -299,8 +299,8 @@
     ctx.fillStyle='#fff';ctx.fillRect(0,0,w,canvas.height);
     const grad=ctx.createLinearGradient(0,0,w,headH);grad.addColorStop(0,'#44265e');grad.addColorStop(1,'#9665ad');ctx.fillStyle=grad;ctx.fillRect(0,0,w,headH);
     txt('✦  MISS BRASIL FASHION PARÁ  ✦',w/2,62,'bold 25px Arial','#f3dba2','center');
-    txt('RIFA DA THAYLA',w/2,155,'bold 75px Arial','#ffffff','center');
-    txt('Thayla Almeida • Representando o Maranhão',w/2,209,'27px Arial','#f4e8fa','center');
+    txt('RIFA DA THAILLA',w/2,155,'bold 75px Arial','#ffffff','center');
+    txt('Thailla Almeida • Representando o Maranhão',w/2,209,'27px Arial','#f4e8fa','center');
     ctx.fillStyle='#f8f3fb';ctx.fillRect(0,headH,w,metaH);
     for(const [idx,lab,value] of [[0,'VENDEDOR(A)',seller.name],[1,'FAIXA',`${fmtNum(seller.start_number)}–${fmtNum(seller.end_number)}`],[2,'DISPONÍVEIS',`${numbers.length} números`]]){
       const x=w*(idx+.5)/3;
@@ -320,7 +320,7 @@
     txt(`Sorteio: ${cfg.drawDate||'15/12/2026'} às ${cfg.drawTime||'18h'}     •     Pix: ${cfg.pixKey||'62501022300'}`,w/2,footerY+83,'24px Arial','#46354e','center');
     ctx.fillStyle='#4e2a6a';ctx.fillRect(0,footerY+footerH-34,w,34);
     txt('ESCOLHA SEUS NÚMEROS E CONSULTE O VENDEDOR!',w/2,footerY+footerH-10,'bold 19px Arial','#ffffff','center');
-    const link=document.createElement('a');link.download=`rifa-thayla-disponiveis-${seller.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}.png`;
+    const link=document.createElement('a');link.download=`rifa-thailla-disponiveis-${seller.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}.png`;
     link.href=canvas.toDataURL('image/png');document.body.appendChild(link);link.click();link.remove();notify('Imagem PNG gerada. Envie pelo WhatsApp!');
   }
   function exportCsv() {
@@ -330,7 +330,7 @@
     const rows=APP.tickets.map(t=>[fmtNum(t.number),sellerOf(t.seller_id)?.name||'',t.buyer_name||'',t.buyer_phone||'',labelStatus(t.status),t.paid_at||'',t.notes||'']);
     const csv='\uFEFF'+[header,...rows].map(r=>r.map(quote).join(';')).join('\r\n');
     const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');a.href=url;a.download='rifa-thayla-vendas.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+    const a=document.createElement('a');a.href=url;a.download='rifa-thailla-vendas.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
   }
   function wireEvents() {
     $('loginForm').addEventListener('submit',login);
