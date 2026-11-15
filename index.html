@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <meta name="theme-color" content="#5b3679" />
+  <meta name="description" content="Rifa da Thayla Almeida: controle de vendas, números disponíveis e premiação do Miss Brasil Fashion Pará." />
+  <title>Rifa da Thayla | Controle de vendas</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="./config.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <section id="loginView" class="login-layout">
+    <div class="login-aside">
+      <span class="eyebrow white"><span class="spark"></span> CONTROLE DA RIFA</span>
+      <div class="login-illustration" aria-hidden="true"><span>✦</span><span class="big-number">1.000</span><small>números da campanha</small></div>
+      <div class="aside-copy">
+        <div class="logo-halo">T</div>
+        <h1>Juntos pelo<br/><em>sonho da Thayla.</em></h1>
+        <p>Organização dos números, pagamentos e vendedores em um só lugar, acessível pelo celular.</p>
+        <div class="aside-pills"><span>Miss Brasil Fashion Pará</span><span>Representando o Maranhão</span></div>
+      </div>
+    </div>
+    <div class="login-pane">
+      <div class="login-card">
+        <div class="brand-row"><div class="brand-icon">T<span>✦</span></div><div><b>Rifa da Thayla</b><small>Área exclusiva dos vendedores</small></div></div>
+        <p class="overline">ACESSO À PLATAFORMA</p>
+        <h2>Bem-vindo(a)!</h2>
+        <p class="muted">Entre com o usuário (e-mail) e a senha cadastrados pelo organizador.</p>
+        <div id="configNotice" class="notice notice-warn hidden"><strong>Configuração pendente.</strong><p>Antes do primeiro acesso, configure o Supabase em <code>config.js</code> e instale o banco com os arquivos SQL. Veja o README.</p></div>
+        <form id="loginForm" autocomplete="on">
+          <label for="loginEmail">Usuário / e-mail</label>
+          <input id="loginEmail" type="email" placeholder="seuemail@exemplo.com" required autocomplete="username" />
+          <label for="loginPassword">Senha</label>
+          <div class="password-wrap"><input id="loginPassword" type="password" placeholder="Digite sua senha" minlength="6" required autocomplete="current-password"/><button id="togglePassword" type="button" class="password-toggle" aria-label="Mostrar senha">Mostrar</button></div>
+          <div id="loginError" class="error-text" role="alert" aria-live="polite"></div>
+          <button id="loginSubmit" class="btn btn-primary btn-full" type="submit">Entrar no sistema <span aria-hidden="true">→</span></button>
+        </form>
+        <p class="login-foot">🔒 Autenticação protegida pelo Supabase. Apenas usuários autorizados podem consultar as vendas.</p>
+      </div>
+    </div>
+  </section>
+
+  <div id="appView" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="sidebar-brand"><div class="brand-icon light">T<span>✦</span></div><div><strong>Rifa da Thayla</strong><small>Controle de vendas</small></div></div>
+      <div class="side-divider"></div>
+      <div class="side-heading">MENU PRINCIPAL</div>
+      <nav class="main-nav" aria-label="Menu principal">
+        <button class="nav-item active" data-view="dashboard"><span class="nav-emoji">◫</span> Visão geral</button>
+        <button class="nav-item" data-view="sales"><span class="nav-emoji">▦</span> Controle de números</button>
+        <button class="nav-item" data-view="share"><span class="nav-emoji">▧</span> Imagem para clientes</button>
+        <button class="nav-item" data-view="prizes"><span class="nav-emoji">✧</span> Premiação e sorteio</button>
+      </nav>
+      <div class="sidebar-bottom"><div class="campaign-mini"><small>SORTEIO</small><strong>15 DEZ 2026</strong><span>Às 18h • R$ 10 por número</span></div><div class="profile-mini"><div class="profile-avatar" id="avatarLetter">A</div><div class="profile-text"><strong id="profileName">Usuário</strong><span id="profileRole">Carregando…</span></div><button id="signOut" class="icon-btn" title="Sair" aria-label="Sair">↪</button></div></div>
+    </aside>
+
+    <div class="workspace">
+      <header class="workspace-topbar"><div class="mobile-brand"><span class="small-brand">T✦</span> Rifa da Thayla</div><div class="topbar-crumb">Campanha / <b id="currentSection">Visão geral</b></div><div class="topbar-actions"><span class="live-indicator">● <span>Online</span></span><button id="refreshAll" class="btn btn-soft btn-sm">↻ Atualizar</button><button id="signOutMobile" class="btn btn-sm btn-outline mobile-only">Sair</button></div></header>
+      <nav class="mobile-nav" aria-label="Menu principal no celular"><button data-view="dashboard" class="active">Painel</button><button data-view="sales">Números</button><button data-view="share">Compartilhar</button><button data-view="prizes">Prêmios</button></nav>
+      <main class="main-content">
+        <section id="view-dashboard" class="page-view">
+          <div class="section-head"><div><p class="overline">ACOMPANHAMENTO DA CAMPANHA</p><h2>Visão geral <span class="title-star">✦</span></h2><p class="muted">Tudo que você precisa saber sobre as vendas da rifa.</p></div><div class="update-tag">Atualizado: <span id="lastUpdated">—</span></div></div>
+          <div class="hero-banner"><div><span class="banner-overline">MISS BRASIL FASHION PARÁ</span><h3>Um sonho que<br/>ganha forma com você.</h3><p>Thayla Almeida • Representando o Maranhão</p></div><div class="hero-decoration"><div class="hero-ring"><span>✦</span></div></div></div>
+          <div id="kpiCards" class="kpi-grid"></div>
+          <div class="panel panel-table"><div class="panel-head"><div><h3>Desempenho por vendedor</h3><p class="muted small">Resumo de pagamentos e números restantes.</p></div><span class="subtle-pill">6 vendedores</span></div><div class="table-scroll"><table class="stats-table"><thead><tr><th>Vendedor</th><th>Faixa</th><th>Pagos</th><th>Reservados</th><th>Disponíveis</th><th>Progresso</th></tr></thead><tbody id="sellerStats"></tbody></table></div></div>
+          <div class="bottom-strip"><span>📅 <strong>15/12/2026</strong> • Sorteio às 18h</span><span>💳 <strong>Pix:</strong> 62501022300</span><span>🎟️ <strong>R$ 10,00</strong> por número</span></div>
+        </section>
+
+        <section id="view-sales" class="page-view hidden">
+          <div class="section-head"><div><p class="overline">CONTROLE DE VENDAS</p><h2>Gerenciar números <span class="title-star">✦</span></h2><p class="muted">Registre compradores e confirme pagamentos. Os dados são compartilhados em tempo real ao atualizar.</p></div><button id="csvButton" class="btn btn-outline btn-sm hidden">↓ Exportar CSV</button></div>
+          <div class="panel filter-panel"><div class="filters-row"><label class="filter-control"><span>Pesquisar número ou comprador</span><input id="searchTicket" type="search" placeholder="Ex.: 006 ou Ana"/></label><label class="filter-control"><span>Vendedor</span><select id="salesSeller"></select></label><label class="filter-control"><span>Situação</span><select id="salesStatus"><option value="all">Todas</option><option value="disponivel">Disponíveis</option><option value="reservado">Reservados</option><option value="pago">Pagos</option></select></label></div></div>
+          <div class="panel sales-panel"><div class="panel-head"><div><h3>Números cadastrados</h3><p id="salesResultCount" class="muted small">—</p></div><span class="subtle-pill">Toque em editar</span></div><div class="table-scroll"><table class="tickets-table"><thead><tr><th>Número</th><th>Vendedor</th><th>Comprador</th><th>Situação</th><th>Data pagamento</th><th></th></tr></thead><tbody id="ticketRows"></tbody></table></div><div id="salesPager" class="pagination"></div></div>
+        </section>
+
+        <section id="view-share" class="page-view hidden">
+          <div class="section-head"><div><p class="overline">PRONTO PARA O WHATSAPP</p><h2>Mostre os números livres <span class="title-star">✦</span></h2><p class="muted">Selecione o vendedor, tire um print ou baixe uma imagem com os números disponíveis.</p></div></div>
+          <div class="panel share-toolbar"><label class="filter-control"><span>Mostrar números de</span><select id="shareSeller"></select></label><div class="share-actions"><button id="downloadImage" class="btn btn-primary">↓ Baixar imagem PNG</button><button id="shareText" class="btn btn-outline">↗ Copiar números</button><button id="printShare" class="btn btn-soft">⎙ Imprimir</button></div></div>
+          <div id="shareHint" class="share-hint">As opções exibem apenas números disponíveis; vendidos e reservados ficam fora da lista.</div>
+          <div class="share-preview-outer"><div id="shareCard" class="share-card" aria-label="Cartão com números disponíveis para compartilhar"></div></div>
+        </section>
+
+        <section id="view-prizes" class="page-view hidden">
+          <div class="section-head"><div><p class="overline">REGULAMENTO DA CAMPANHA</p><h2>Prêmios e sorteio <span class="title-star">✦</span></h2><p class="muted">Informações para vendedores e participantes.</p></div></div>
+          <div class="prizes-intro"><div class="prize-intro-icon">🏆</div><div><p class="overline">NOSSA PREMIAÇÃO</p><h3>Três chances de ganhar!</h3><p>Compre seu número por R$ 10,00 e participe do sorteio.</p></div></div>
+          <div class="prize-grid"><article class="prize-card prize-main"><span class="prize-medal">🥇 1º LUGAR</span><h3>Kit festa completo</h3><p>Bolo de <strong>2 kg</strong>, <strong>100 brigadeiros de leite</strong> e <strong>kit pegue e monte</strong>, já com a arte de balão inclusa.</p><div class="prize-note">Tema a critério do ganhador • Retirada até 30/06/2027</div></article><article class="prize-card"><span class="prize-medal">🥈 2º LUGAR</span><h3>Balão de mesa temático</h3><p>Um balão de mesa personalizado com tema escolhido para a ocasião.</p></article><article class="prize-card"><span class="prize-medal">🥉 3º LUGAR</span><h3>Balão de mesa temático</h3><p>Um balão de mesa temático para decorar e celebrar.</p></article></div>
+          <div class="panel event-details"><div><span class="detail-icon">📆</span><div><b>Sorteio</b><p>15 de dezembro de 2026, às 18h</p></div></div><div><span class="detail-icon">💵</span><div><b>Valor</b><p>R$ 10,00 por número</p></div></div><div><span class="detail-icon">💳</span><div><b>Chave Pix</b><p>62501022300</p></div></div></div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <dialog id="ticketDialog" class="modal"><form method="dialog" id="ticketEditor"><div class="modal-header"><div><span class="overline">REGISTRAR VENDA</span><h3 id="modalTitle">Número 001</h3></div><button class="modal-close" type="button" id="closeModal" aria-label="Fechar">×</button></div><div class="modal-body"><div class="modal-summary"><span id="modalSeller">Amanda</span><span id="modalStatus">Disponível</span></div><label for="buyerName">Nome do comprador *</label><input id="buyerName" placeholder="Nome completo" maxlength="120"/><label for="buyerPhone">Telefone / WhatsApp</label><input id="buyerPhone" type="tel" placeholder="(98) 99999-9999" maxlength="30"/><label for="ticketStatus">Situação</label><select id="ticketStatus"><option value="disponivel">Disponível</option><option value="reservado">Reservado (aguardando Pix)</option><option value="pago">Pago (Pix conferido)</option></select><label for="ticketNotes">Observações</label><textarea id="ticketNotes" rows="2" maxlength="500" placeholder="Anotações opcionais"></textarea><p class="muted small">Marque como pago somente após confirmar o recebimento. Libere o número para apagar os dados do comprador.</p><div id="modalError" class="error-text" role="alert"></div></div><div class="modal-actions"><button id="releaseTicket" type="button" class="btn btn-danger-soft">Liberar número</button><button id="cancelTicket" type="button" class="btn btn-outline">Cancelar</button><button id="saveTicket" type="submit" class="btn btn-primary">Salvar</button></div></form></dialog>
+</body>
+</html>
